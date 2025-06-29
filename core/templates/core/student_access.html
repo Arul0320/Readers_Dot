@@ -1,0 +1,12 @@
+{% extends "core/base.html" %}
+
+{% block title %}Student Access{% endblock %}
+
+{% block content %}
+    <h2>Enter OTP to Access Reading Material</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}

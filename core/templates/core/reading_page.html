@@ -1,0 +1,169 @@
+{% extends "core/base.html" %}
+
+{% block extra_css %}
+<style>
+    #reading-text {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        min-height: 200px;
+    }
+    .modal-content {
+        border-radius: 15px;
+    }
+    .feedback {
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reading-container">
+    {% if last_answer_correct is not None %}
+        <div class="feedback alert {% if last_answer_correct %}alert-success{% else %}alert-danger{% endif %}">
+            {% if last_answer_correct %}
+                <i class="bi bi-check-circle-fill"></i> Correct! The word was "{{ correct_word }}"
+            {% else %}
+                <i class="bi bi-x-circle-fill"></i> Incorrect. The correct word was "{{ correct_word }}"
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    <div id="reading-text" class="mb-4"></div>
+    
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="score-display">
+            Score: <span id="score-display">0</span>
+        </div>
+        <div class="progress" style="width: 70%; height: 20px;">
+            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Question Modal -->
+<div class="modal fade" id="questionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reading Check</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>What was the word BEFORE the underlined word?</p>
+                <form method="post" id="answer-form" action="{% url 'check_answer' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="current_word" id="current-word">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" name="answer" required placeholder="Enter the word">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Submit Answer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Completion Modal -->
+<div class="modal fade" id="completeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Reading Complete!</h5>
+            </div>
+            <div class="modal-body">
+                <p class="lead">Your final score: <span id="final-score">0</span></p>
+                <form method="post" id="complete-form" action="{% url 'complete_reading' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Your Name</label>
+                        <input type="text" class="form-control" name="student_name" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Submit Results</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paragraph = "{{ paragraph.content|escapejs }}";
+        const words = paragraph.split(' ');
+        const readingText = document.getElementById('reading-text');
+        const questionModal = new bootstrap.Modal(document.getElementById('questionModal'));
+        const completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
+        const currentWordInput = document.getElementById('current-word');
+        const scoreDisplay = document.getElementById('score-display');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const progressBar = document.getElementById('progress-bar');
+        
+        let currentWordIndex = 0;
+        const questionInterval = 10;
+        let score = 0;
+        let questionCount = 0;
+        const speed = 500;
+        
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = score;
+            finalScoreDisplay.textContent = score;
+            const percentage = (currentWordIndex / words.length) * 100;
+            progressBar.style.width = `${percentage}%`;
+        }
+        
+        function typeWriter() {
+            if (currentWordIndex < words.length) {
+                let displayText = words.slice(0, currentWordIndex).join(' ');
+                displayText += ' <span class="underline-animation">' + words[currentWordIndex] + '</span>';
+                readingText.innerHTML = displayText;
+                
+                if ((currentWordIndex + 1) % questionInterval === 0 && currentWordIndex > 0) {
+                    currentWordInput.value = words[currentWordIndex-1];
+                    questionModal.show();
+                    return;
+                }
+                
+                currentWordIndex++;
+                updateScoreDisplay();
+                setTimeout(typeWriter, speed);
+            } else {
+                readingText.innerHTML = words.join(' ');
+                updateScoreDisplay();
+                completeModal.show();
+            }
+        }
+        
+        // Start the animation
+        typeWriter();
+        
+        // Handle answer form submission
+        document.getElementById('answer-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const userAnswer = formData.get('answer').trim().toLowerCase();
+            const previousWord = formData.get('current_word').trim().toLowerCase();
+            
+            if (userAnswer === previousWord) {
+                score++;
+                updateScoreDisplay();
+            }
+            questionCount++;
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            }).then(() => {
+                questionModal.hide();
+                currentWordIndex++;
+                setTimeout(typeWriter, speed);
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

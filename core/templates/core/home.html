@@ -1,0 +1,21 @@
+{% extends "core/base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1>Welcome to Reader's Dot</h1>
+    {% if user.is_authenticated %}
+        {% if user.is_staff %}
+            <p>As an admin, you can upload paragraphs and view results.</p>
+            <!-- <a href="{% url 'admin_upload' %}" class="button">Upload Paragraph</a> -->
+            <a href="{% url 'admin_upload' %}" class="btn btn-primary">
+    Upload Paragraph
+</a>
+        {% else %}
+            <p>As a student, you can access reading materials with an OTP.</p>
+            <a href="{% url 'student_access' %}" class="button">Student Access</a>
+        {% endif %}
+    {% else %}
+        <p>Please login or register to continue.</p>
+    {% endif %}
+{% endblock %}

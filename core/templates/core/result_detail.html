@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+
+{% block title %}Result Details{% endblock %}
+
+{% block content %}
+<h2>Result Details</h2>
+<div class="result-details">
+    <p><strong>Student:</strong> {{ result.student_name }}</p>
+    <p><strong>Paragraph:</strong> {{ result.paragraph.id }}</p>
+    <p><strong>Score:</strong> {{ result.score }}/{{ result.total_questions }}</p>
+    <p><strong>Date:</strong> {{ result.created_at }}</p>
+    <p><strong>Content:</strong> {{ result.paragraph.content }}</p>
+</div>
+<a href="{% url 'view_results' %}">Back to all results</a>
+{% endblock %}

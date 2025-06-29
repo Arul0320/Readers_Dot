@@ -1,0 +1,41 @@
+{% extends "core/base.html" %}
+
+{% block title %}Upload Successful{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow text-center">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Upload Successful
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h4 class="alert-heading">
+                            <i class="bi bi-shield-lock me-2"></i>
+                            Student Access Code
+                        </h4>
+                        <div class="display-4 my-3 text-primary">{{ otp }}</div>
+                        <p>Share this OTP with students to access this reading.</p>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_upload' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Upload Another
+                        </a>
+                        <a href="{% url 'view_results' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-list-check me-2"></i>
+                            View Results
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

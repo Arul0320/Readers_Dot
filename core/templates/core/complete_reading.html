@@ -1,0 +1,17 @@
+{% extends "core/base.html" %}
+
+{# Only one title block #}
+{% block title %}Complete Reading{% endblock %}
+
+{# Only one content block #}
+{% block content %}
+<div class="container">
+    <h2>Reading Complete!</h2>
+    <p>Your score: {{ score }}/{{ total_questions }}</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit Results</button>
+    </form>
+</div>
+{% endblock %}

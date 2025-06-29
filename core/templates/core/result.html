@@ -1,0 +1,14 @@
+{% extends "core/base.html" %}
+
+{% block title %}Result{% endblock %}
+
+{% block content %}
+    <h2>Result for {{ student_name }}</h2>
+    {% if score == 1 %}
+        <p class="success">Correct! The word was "{{ correct_word }}".</p>
+    {% else %}
+        <p class="error">Incorrect. The correct word was "{{ correct_word }}".</p>
+    {% endif %}
+    <p>Your score: {{ score }}</p>
+    <a href="{% url 'student_access' %}">Try another OTP</a>
+{% endblock %}

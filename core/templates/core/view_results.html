@@ -1,0 +1,53 @@
+{% extends "core/base.html" %}
+
+{% block title %}Student Results{% endblock %}
+
+{% block content %}
+<div class="reading-container">
+    <h2 class="mb-4 text-center">Student Results</h2>
+    
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Student</th>
+                    <th>Paragraph ID</th>
+                    <th>Score</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result.student_name }}</td>
+                    <td>{{ result.paragraph.id }}</td>
+                    <td>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar {% if result.score_percentage >= 70 %}bg-success{% elif result.score_percentage >= 40 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                
+                                 aria-valuenow="{{ result.score_percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ result.score }}/{{ result.total_questions }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ result.created_at|date:"M d, Y H:i" }}</td>
+                    <td>
+                        <a href="{% url 'result_detail' result.id %}" class="btn btn-sm btn-info">
+                            <i class="bi bi-eye-fill"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No results available yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
