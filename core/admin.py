@@ -6,3 +6,4 @@ from .models import Paragraph , StudentResult
 admin.site.register(Paragraph)
 admin.site.register(StudentResult)
 
+
