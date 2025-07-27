@@ -1,12 +1,16 @@
 services:
   - type: web
-    name: readersdot
+    name: readers-dot
     runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn readersdot.wsgi:application
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn readers_dot.wsgi:application"
     envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: readersdot.settings
-      - key: PYTHON_VERSION
-        value: 3.10
-    staticPublishPath: staticfiles
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: readersdotdb
+          property: connectionString
+databases:
+  - name: readersdotdb
+    plan: free  # Free tier (upgrade for production)
